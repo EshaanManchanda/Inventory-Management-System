@@ -113,8 +113,19 @@ class userAdmin: #we are make class here
             messagebox.showerror("Error",f"Error due to :{str(ex)}",parent=self.root)
             
     def exit_(self):
-            self.root.destroy()
-            os.system("python login.py")
+        con=sqlite3.connect(database=r'BMS.db')
+        cur=con.cursor()
+        try:
+            cur.execute("select * from employee where utype='Admin' ")
+            user=cur.fetchone()
+            if user==None:
+                messagebox.showerror("Error","please create admin first",parent=self.root)
+            else:
+                self.root.destroy()
+                os.system("python login.py")
+        except Exception as ex:
+            messagebox.showerror("Error",f"Error due to :{str(ex)}",parent=self.root)
+           
 #====clear Function ==========================
 
     def clear(self):

@@ -21,6 +21,7 @@ class IMS:
         self.root.after(3000, self.fetchemp)
     
     def fetchemp(self):
+        os.system("python create_db.py")
         con=sqlite3.connect(database=r'BMS.db')
         cur=con.cursor()
         try:
