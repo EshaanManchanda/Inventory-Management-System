@@ -1,16 +1,19 @@
+import sqlite3
 from tkinter import *
 from tkinter import font
+from tkinter import messagebox
 from PIL import Image,ImageTk #pip install pillow
 from employee import EmployeeClass
 from supplier import supplierClass
 from category import categoryClass
 from product import productClass
 from sales import salesClass
+import time,os
 
 class IMS: #we are make class here
     def __init__(self,root):#this is defaule constructor. root is the object
         self.root = root#this define object of class using self(this is concept of oop's)
-        self.root.geometry("1350x712+0+0")#it is used to define size of the frame or window
+        self.root.geometry("1512x712+0+0")#it is used to define size of the frame or window
         self.root.title("Inventory Management System | Developed by Tech Love V")
         self.root.config(bg="white")
         
@@ -21,7 +24,7 @@ class IMS: #we are make class here
         
         #====button_Logout=========
         
-        btn_logout=Button(self.root,text="Logout",font=("times new roman",15,"bold"),bg="yellow",cursor="hand2").place(x=1350,y=10,height=50,width=150)
+        btn_logout=Button(self.root,text="Logout",command=self.logout,font=("times new roman",15,"bold"),bg="yellow",cursor="hand2").place(x=1350,y=10,height=50,width=150)
         
         #====Clock================================
         self.lbl_clock=Label(self.root,text="Welcome to Inventory Management System\t\t  Date: DD-MM-YYYY \t\tTime: HH:MM:SS",font=("times new roman",15,"bold"),bg="#9C9C9C",fg="white")
@@ -80,12 +83,14 @@ class IMS: #we are make class here
         
         #this is for sales
         self.lbl_sales=Label(self.root,text="Total Sales\n[0]",bd=5,relief=RIDGE,bg="#A85619",fg="white",font=("times new roman",20,"bold"))
-        self.lbl_sales.place(x=300,y=300,height=150,width=300)
+        self.lbl_sales.place(x=650,y=300,height=150,width=300)
         
         
         
          #====Footer================================
         lbl_footer=Label(self.root,text="Inventory Management System | Developed by Tech Love V \nFor any technical issue contact: +91 8377012270",font=("times new roman",12),bg="#9C9C9C",fg="white").pack(side=BOTTOM,fill=X)
+        
+        self.update_content()
         
 #=======================================================
     def employee(self):
@@ -103,10 +108,43 @@ class IMS: #we are make class here
     def sales(self):
         self.new_win=Toplevel(self.root)
         self.new_obj=salesClass(self.new_win)
-        
+    def logout(self):
+        self.root.destroy()
+        os.system("python login.py")
     
-        
-        
+    def update_content(self):
+        con=sqlite3.connect(database=r'BMS.db')
+        cur=con.cursor()
+        try:
+            cur.execute("select * from product")
+            product=cur.fetchall()
+            self.lbl_products.config(text=f"Total Products\n{str(len(product))}")
+            
+            
+            cur.execute("select * from supplier")
+            supplier=cur.fetchall()
+            self.lbl_supplier.config(text=f"Total Suppliers\n{str(len(supplier))}")
+            
+            
+            cur.execute("select * from category")
+            category=cur.fetchall()
+            self.lbl_category.config(text=f"Total Category\n{str(len(category))}")
+            
+            
+            cur.execute("select * from employee")
+            employee=cur.fetchall()
+            self.lbl_employee.config(text=f"Total Employees\n{str(len(employee))}")
+            
+            self.lbl_sales.config(text=f"Total Sales\n{str(len(os.listdir('bill')))}")
+            
+            time_=time.strftime("%I:%M:%S")
+            date_=time.strftime("%d-%m-%Y")
+            self.lbl_clock.config(text=f"Welcome to Inventory Management System\t\t  Date: {str(date_)} \t\tTime: {str(time_)}")
+            self.lbl_clock.after(200,self.update_content)
+            
+            
+        except Exception as ex:
+            messagebox.showerror("Error",f"Error due to :{str(ex)}",parent=self.root)
         
 if __name__ == "__main__":
     root=Tk()#make root oject of tk class
